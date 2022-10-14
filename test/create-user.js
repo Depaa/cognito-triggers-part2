@@ -1,7 +1,7 @@
 const { CognitoIdentityProviderClient, SignUpCommand } = require('@aws-sdk/client-cognito-identity-provider');
 
-const COGNITO_CLIENT_ID = process.env.COGNITO_CLIENT_ID;
-const USER_EMAIL = process.env.USER_EMAIL;
+const COGNITO_CLIENT_ID = '7vgbpi5q6b5n6h4j802r94tcuj';
+const USER_EMAIL = 'depascale.matteo+2@gmail.com';
 const USER_PHONE_NUMBER = process.env.USER_PHONE_NUMBER;
 const USER_PASSWORD = 'pswBLOG2022?';
 

@@ -1,6 +1,6 @@
 {
   "name": "cdk-cognito-triggers",
-  "version": "0.30.0",
+  "version": "0.41.0",
   "bin": {
     "cdk-boilerplate": "infra/app.js"
   },

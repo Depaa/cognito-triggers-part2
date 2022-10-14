@@ -6,6 +6,7 @@ import { CognitoStack } from './stacks/cognito-pools';
 import { UserTableStack } from './stacks/user-table';
 import { SignupReminderStack } from './stacks/reminder-step-function';
 import { SESIdentitiesStack } from './stacks/ses-identities';
+import { UserBucketStack } from './stacks/user-bucket';
 
 const app = new App();
 
@@ -21,9 +22,15 @@ const cognitoStackId = `${stackId}`;
 const sesIdentitiesStackId = `${stackId}-ses`;
 const signupReminderStackId = `${stackId}-signup-reminder`;
 const userTableStackId = `${stackId}-users-table`;
+const userBucketStackId = `${stackId}-users-bucket`;
 
 new SESIdentitiesStack(app, sesIdentitiesStackId, {
   ...baseProps,
+}, buildConfig);
+
+const userBucketStack = new UserBucketStack(app, userBucketStackId, {
+  ...baseProps,
+  stackName: userBucketStackId,
 }, buildConfig);
 
 const userTableStack = new UserTableStack(app, userTableStackId, {
@@ -36,6 +43,7 @@ const cognitoStack = new CognitoStack(app, cognitoStackId, {
   stackName: cognitoStackId,
   usersTable: userTableStack.usersTable.tableName,
   usersTableArn: userTableStack.usersTable.tableArn,
+  usersBucketArn: userBucketStack.usersBucket.bucketArn,
   stateMachineArn: `arn:aws:states:${env.region}:${env.account}:stateMachine:${signupReminderStackId}`,
 }, buildConfig);
 
