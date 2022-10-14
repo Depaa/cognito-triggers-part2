@@ -37,17 +37,30 @@ class Camera extends Component {
     }
   }
 
+  dataURLtoFile = (dataurl, filename) => {
+    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, {type:mime});
+  };
+
   capturePhoto = async () => {
     const imageSrc = this.webcamRef.current.getScreenshot();
     this.setState({ url: imageSrc });
     console.log(imageSrc)
+
+    const file = this.dataURLtoFile(imageSrc, 'test.jpeg');
+    console.log(file);
+
     const response = await fetch(imageSrc)
     console.log(response)
     const blob = await response.blob()
     console.log(blob)
 
     try {
-      const result = await Storage.put("signup/test.jpeg", blob, {
+      const result = await Storage.put("signup/test.jpeg", file, {
         level: "private",
         contentType: "image/jpeg",
       });

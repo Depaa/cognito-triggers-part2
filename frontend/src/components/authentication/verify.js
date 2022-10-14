@@ -1,37 +1,43 @@
 import React, { Component } from "react";
-import { Auth } from "aws-amplify";
+import { Auth, Hub } from "aws-amplify";
+import { Button, Input } from '@mui/material';
 
 export default class Verify extends Component {
-  handleVerification = event => {
+
+  handleVerification = async event => {
     event.preventDefault();
-    const { username, code } = this.props.inputs;
-    // After retrieveing the confirmation code from the user
-    Auth.confirmSignUp(username, code, {
+    const { email, code } = this.props.inputs;
+    const auth = await Auth.confirmSignUp(email, code, {
       forceAliasCreation: true
+    });
+
+    Hub.listen('auth', ({ payload }) => {
+      const { event } = payload;
+      if (event === 'autoSignIn') {
+        const user = payload.data;
+        console.log("AUTH_LISTEN", user);
+        this.setState({ sub: user.username })
+      }
     })
-      .then(data => console.log(data))
-      .then(() => this.props.switchComponent("SignIn"))
-      .catch(err => console.log(err));
+
+    console.log("Verify", auth);
+    this.props.switchComponent("Camera");
   };
 
   render() {
     return (
-      <form className="authentication__form">
-        <input
-          type="text"
-          name="code"
-          value={this.props.code}
-          placeholder="Verification Code"
-          onChange={this.props.handleFormInput}
-          className="authentication__input"
-        />
-        <input
-          type="submit"
-          value="SUBMIT VERIFICATION"
-          onClick={this.handleVerification}
-          className="authentication__button"
-        />
-      </form>
+      <div className="verify">
+        <form className="form">
+          <Input
+            type="text"
+            name="code"
+            value={this.props.code}
+            placeholder="Verification Code"
+            onChange={this.props.handleFormInput}
+          />
+          <Button type="button" onClick={this.handleVerification} variant="contained">CONFIRM</Button>
+        </form>
+      </div>
     );
   }
 }
