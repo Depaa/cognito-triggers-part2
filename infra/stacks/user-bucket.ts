@@ -1,5 +1,5 @@
 import { App, Stack, StackProps } from 'aws-cdk-lib';
-import { BlockPublicAccess, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
+import { BlockPublicAccess, Bucket, BucketEncryption, HttpMethods } from 'aws-cdk-lib/aws-s3';
 import { BuildConfig } from '../lib/common/config.interface';
 import { name } from '../lib/common/utils';
 
@@ -17,6 +17,17 @@ export class UserBucketStack extends Stack {
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       bucketName: name,
       encryption: BucketEncryption.S3_MANAGED,
+      cors: [
+        {
+          allowedMethods: [
+            HttpMethods.GET,
+            HttpMethods.POST,
+            HttpMethods.PUT,
+          ],
+          allowedOrigins: ['http://localhost:3000'],
+          allowedHeaders: ['*'],
+        },
+      ],
     });
   }
 }

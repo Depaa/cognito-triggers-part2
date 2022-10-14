@@ -145,7 +145,7 @@ export class CognitoStack extends Stack {
         adminUserPassword: !custom,
         custom: true,
         userPassword: !custom,
-        userSrp: !custom
+        userSrp: true
       },
       refreshTokenValidity: Duration.minutes(60),
       accessTokenValidity: Duration.minutes(5),
