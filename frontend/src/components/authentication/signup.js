@@ -1,27 +1,23 @@
 import React, { Component } from "react";
 import { Auth } from "aws-amplify";
-import {
-  Button,
-  Input
-} from '@mui/material'
-const uuid = require('uuid');
+import { Button, Input } from '@mui/material';
 
 export default class SignUp extends Component {
 
   handleSignUp = async event => {
     event.preventDefault();
-    const fileLocation = "signup/" + uuid.v5();
-    const { email } = this.props.inputs;
-    const password = 'Password1!';
-    const auth = await Auth.signUp({
+    const { email, password } = this.props.inputs;
+    await Auth.signUp({
       username: email,
       password,
       attributes: {
         email,
-        'custom:flag': fileLocation,
       },
+      autoSignIn: {
+        enabled: true,
+      }
     })
-    console.log(auth);
+    this.props.switchComponent("Verify");
   };
 
   render() {
@@ -36,7 +32,7 @@ export default class SignUp extends Component {
             onChange={this.props.handleFormInput}
             variant="filled"
           />
-          <Button type="button" onClick={this.handleSignUp} variant="contained">Submit</Button>
+          <Button type="button" onClick={this.handleSignUp} variant="contained">SignUp</Button>
         </form>
       </div>
     );
