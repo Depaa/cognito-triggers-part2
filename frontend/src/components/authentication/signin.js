@@ -10,7 +10,6 @@ export default class SignIn extends Component {
   handleSignIn = async event => {
     event.preventDefault();
     const { username } = this.props.inputs;
-    const password = 'Password1!'
     
     const cognitoUser = await Auth.signIn({ username/*, password*/ })
 
@@ -34,7 +33,7 @@ export default class SignIn extends Component {
             onChange={this.props.handleFormInput}
             variant="filled"
           />
-          <Button type="button" onClick={this.handleSignIn} variant="contained">Submit</Button>
+          <Button type="button" onClick={this.handleSignIn} variant="contained">SignIn</Button>
         </form>
       </div>
     );
