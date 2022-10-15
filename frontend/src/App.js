@@ -1,7 +1,7 @@
 import { Amplify } from 'aws-amplify';
 import config from './aws-exports';
 import React, { Component } from 'react';
-import Authentication from "./components/authentication"
+import Authentication from "./components"
 Amplify.configure(config);
 
 class App extends Component {

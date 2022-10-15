@@ -64,7 +64,7 @@ export default class Camera extends Component {
       });
       console.log(result);
       console.log(this.props);
-      // this.props.switchComponent('Success');
+      this.props.switchComponent('Success');
     } catch (e) {
       console.error(e);
     }
