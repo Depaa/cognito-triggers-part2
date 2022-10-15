@@ -19,7 +19,8 @@ export default class Camera extends Component {
   }
 
   state = {
-    url: null
+    url: null,
+    file: null,
   };
 
   async componentDidMount() {
@@ -35,24 +36,32 @@ export default class Camera extends Component {
     }
   }
 
+  dataURLtoFile = (dataurl, filename) => {
+    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+      bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
+  };
+
   capturePhoto = async () => {
-    console.log(this.props);
     const imageSrc = this.webcamRef.current.getScreenshot();
-    this.setState({ url: imageSrc });
+    const file = this.dataURLtoFile(imageSrc, 'test.jpeg');
+    this.setState({ url: imageSrc, file: file });
     console.log(this.props);
-    this.props.switchComponent('Success');
   }
 
   submitPhoto = async () => {
     try {
       const id = v4();
-      const result = await Storage.put(id + '.jpeg', this.url, {
+      const result = await Storage.put(id + '.jpeg', this.state.file, {
         level: 'private',
         contentType: 'image/jpeg',
       });
       console.log(result);
       console.log(this.props);
-      this.props.switchComponent('Success');
+      // this.props.switchComponent('Success');
     } catch (e) {
       console.error(e);
     }
