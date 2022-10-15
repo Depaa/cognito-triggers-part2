@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Auth, Hub } from "aws-amplify";
+import { Auth } from "aws-amplify";
 import { Button, Input } from '@mui/material';
 
 export default class Verify extends Component {
@@ -7,21 +7,15 @@ export default class Verify extends Component {
   handleVerification = async event => {
     event.preventDefault();
     const { email, code } = this.props.inputs;
-    const auth = await Auth.confirmSignUp(email, code, {
-      forceAliasCreation: true
-    });
+    try {
+      await Auth.confirmSignUp(email, code, {
+        forceAliasCreation: true
+      });
 
-    Hub.listen('auth', ({ payload }) => {
-      const { event } = payload;
-      if (event === 'autoSignIn') {
-        const user = payload.data;
-        console.log("AUTH_LISTEN", user);
-        this.setState({ sub: user.username })
-      }
-    })
-
-    console.log("Verify", auth);
-    this.props.switchComponent("Camera");
+      this.props.switchComponent("Camera");
+    } catch (e) {
+      console.error(e)
+    }
   };
 
   render() {

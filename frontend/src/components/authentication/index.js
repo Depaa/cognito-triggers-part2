@@ -6,6 +6,7 @@ import SignUp from './signup';
 import Verify from './verify';
 import Welcome from './welcome';
 import Camera from './camera';
+import Success from './success-signup';
 import './index.css';
 
 
@@ -23,7 +24,7 @@ export default class Authentication extends Component {
 
   async componentDidMount() {
     const auth = await Auth.currentAuthenticatedUser({
-      bypassCache: false 
+      bypassCache: false
     })
     const user = { username: auth.username, ...auth.attributes }
     if (user.email_verified) this.setState({ user, status: 'Welcome' })
@@ -58,6 +59,15 @@ export default class Authentication extends Component {
       case 'Camera':
         return (
           <Camera
+            switchComponent={this.switchComponent}
+            handleFormInput={this.handleFormInput}
+            inputs={this.state}
+          />
+        );
+
+      case 'Success':
+        return (
+          <Success
             switchComponent={this.switchComponent}
             handleFormInput={this.handleFormInput}
             inputs={this.state}

@@ -7,17 +7,21 @@ export default class SignUp extends Component {
   handleSignUp = async event => {
     event.preventDefault();
     const { email, password } = this.props.inputs;
-    await Auth.signUp({
-      username: email,
-      password,
-      attributes: {
-        email,
-      },
-      autoSignIn: {
-        enabled: true,
-      }
-    })
-    this.props.switchComponent("Verify");
+    try {
+      await Auth.signUp({
+        username: email,
+        password,
+        attributes: {
+          email,
+        },
+        autoSignIn: {
+          enabled: true,
+        }
+      })
+      this.props.switchComponent("Verify");
+    } catch (e) {
+      console.error(e)
+    }
   };
 
   render() {

@@ -4,6 +4,7 @@ import {
   Button,
 } from '@mui/material';
 import { Storage } from 'aws-amplify';
+import { v4 } from 'uuid';
 
 const videoConstraints = {
   height: 1080,
@@ -17,56 +18,43 @@ export default class Camera extends Component {
     this.webcamRef = React.createRef();
   }
 
-  componentDidMount() {
+  state = {
+    url: null
+  };
+
+  async componentDidMount() {
     if (navigator.permissions && navigator.permissions.query) {
-      navigator.permissions
-        .query({ name: 'camera' })
-        .then((permissionObj) => {
-          if (permissionObj.state !== 'granted') {
-            alert('Please allow camera permission');
-          }
-          console.log(permissionObj.state);
-        })
-        .catch((error) => {
-          console.log('Got error :', error);
-        });
+      try {
+        const permissions = await navigator.permissions.query({ name: 'camera' })
+        if (permissions.state !== 'granted') {
+          alert('Please allow camera permission');
+        }
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 
-  dataURLtoFile = (dataurl, filename) => {
-    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
-      bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new File([u8arr], filename, { type: mime });
-  };
-
   capturePhoto = async () => {
     console.log(this.props);
-    // code:"817839"
-    // email:"myemail"
-    // file:null
-    // password:"pswBLOG2022?"
-    // status    :"Camera"
-    // sub:""
-    // user    :    null
-    // username:""
     const imageSrc = this.webcamRef.current.getScreenshot();
-    const file = this.dataURLtoFile(imageSrc, 'test.jpeg');
-    this.setState({ file: file });
+    this.setState({ url: imageSrc });
+    console.log(this.props);
+    this.props.switchComponent('Success');
   }
 
   submitPhoto = async () => {
     try {
-      const result = await Storage.put(this.props.sub, this.file, {
+      const id = v4();
+      const result = await Storage.put(id + '.jpeg', this.url, {
         level: 'private',
         contentType: 'image/jpeg',
       });
       console.log(result);
-      this.props.switchComponent('SignIn');
+      console.log(this.props);
+      this.props.switchComponent('Success');
     } catch (e) {
-      console.error(e)
+      console.error(e);
     }
 
   };
@@ -86,16 +74,16 @@ export default class Camera extends Component {
             width='512px' // size of displaying screen
           />
           <Button type='button' onClick={this.capturePhoto} variant='contained'>Capture</Button>
-          {this.props.file ? (
+          {this.state.url ? (
             <div id='image'>
               <img
                 style={{ height: '288px', width: '512px' }}
-                src={this.props.file} //show pic in state
+                src={this.state.url} //show pic in state
                 alt='Screenshot'
               />
             </div>
           ) : null}
-          {this.props.file ? (<Button type='button' onClick={this.submitPhoto} variant='contained'>SUBMIT PHOTO</Button>) : null}
+          {this.state.url ? (<Button type='button' onClick={this.submitPhoto} variant='contained'>SUBMIT PHOTO</Button>) : null}
         </div>
       </>
     );
