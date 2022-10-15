@@ -7,6 +7,7 @@ import { UserTableStack } from './stacks/user-table';
 import { SignupReminderStack } from './stacks/reminder-step-function';
 import { SESIdentitiesStack } from './stacks/ses-identities';
 import { UserBucketStack } from './stacks/user-bucket';
+import { FaceRekognitionStack } from './stacks/face-rekognition';
 
 const app = new App();
 
@@ -23,6 +24,7 @@ const sesIdentitiesStackId = `${stackId}-ses`;
 const signupReminderStackId = `${stackId}-signup-reminder`;
 const userTableStackId = `${stackId}-users-table`;
 const userBucketStackId = `${stackId}-users-bucket`;
+const faceRekognitionStackId = `${stackId}-rekognition`;
 
 new SESIdentitiesStack(app, sesIdentitiesStackId, {
   ...baseProps,
@@ -36,6 +38,14 @@ const userBucketStack = new UserBucketStack(app, userBucketStackId, {
 const userTableStack = new UserTableStack(app, userTableStackId, {
   ...baseProps,
   stackName: userTableStackId,
+}, buildConfig);
+
+const faceRekognitionStack = new FaceRekognitionStack(app, faceRekognitionStackId, {
+  ...baseProps,
+  usersTableArn: userTableStack.usersTable.tableArn,
+  usersBucketArn: userBucketStack.usersBucket.bucketArn,
+  usersTable: userTableStack.usersTable.tableName,
+  stackName: faceRekognitionStackId,
 }, buildConfig);
 
 const cognitoStack = new CognitoStack(app, cognitoStackId, {
