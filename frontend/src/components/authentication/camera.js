@@ -3,8 +3,7 @@ import Webcam from 'react-webcam';
 import {
   Button,
 } from '@mui/material';
-import { Storage } from 'aws-amplify';
-import { v4 } from 'uuid';
+import { Storage, Auth } from 'aws-amplify';
 
 const videoConstraints = {
   height: 1080,
@@ -46,15 +45,19 @@ export default class Camera extends Component {
   };
 
   capturePhoto = async () => {
+    console.log("CAMERA", this.props);
     const imageSrc = this.webcamRef.current.getScreenshot();
     const file = this.dataURLtoFile(imageSrc, 'test.jpeg');
     this.setState({ url: imageSrc, file: file });
-    console.log(this.props);
   }
 
   submitPhoto = async () => {
     try {
-      const id = v4();
+      const auth = await Auth.currentAuthenticatedUser({
+        bypassCache: false
+      });
+      const id = auth.username;
+
       const result = await Storage.put(id + '.jpeg', this.state.file, {
         level: 'private',
         contentType: 'image/jpeg',

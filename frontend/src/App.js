@@ -1,4 +1,3 @@
-import './components/camera/index.css';
 import { Amplify } from 'aws-amplify';
 import config from './aws-exports';
 import React, { Component } from 'react';

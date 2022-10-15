@@ -6,6 +6,7 @@ export default class SignUp extends Component {
 
   handleSignUp = async event => {
     event.preventDefault();
+    console.log("SIGNUP", this.props);
     const { email, password } = this.props.inputs;
     try {
       await Auth.signUp({

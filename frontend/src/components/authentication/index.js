@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import { Auth } from 'aws-amplify';
 
 import SignIn from './signin';
@@ -11,16 +11,20 @@ import './index.css';
 
 
 export default class Authentication extends Component {
-  state = {
-    username: '',
-    email: '',
-    password: 'pswBLOG2022?',
-    sub: '',
-    code: '',
-    user: null,
-    status: 'SignUp',
-    file: null
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: '',
+      email: '',
+      password: 'pswBLOG2022?',
+      sub: '',
+      code: '',
+      user: null,
+      status: 'SignUp',
+      file: null,
+      fileUrl: null,
+    };
+  }
 
   async componentDidMount() {
     const auth = await Auth.currentAuthenticatedUser({
@@ -34,6 +38,10 @@ export default class Authentication extends Component {
     this.setState({
       [event.target.name]: event.target.value
     });
+  };
+
+  switchComponent = status => {
+    this.setState({ status });
   };
 
   AuthComponent = () => {
@@ -94,10 +102,6 @@ export default class Authentication extends Component {
           />
         );
     }
-  };
-
-  switchComponent = status => {
-    this.setState({ status });
   };
 
   render() {

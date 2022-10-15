@@ -7,7 +7,7 @@ exports.handler = async (event) => {
   for (const record of event.Records) {
     const key = decodeURIComponent(record.s3.object.key);
     const bucketName = record.s3.bucket.name;
-    const sub = key.split('/')[1].replace(`${process.env.REGION}:`, '');
+    const sub = key.split('/')[2].replace(`.jpeg`, '');
 
     const params = {
       CollectionId: process.env.COLLECTION_ID,

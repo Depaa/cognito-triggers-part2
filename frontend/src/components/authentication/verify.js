@@ -1,16 +1,28 @@
 import React, { Component } from "react";
-import { Auth } from "aws-amplify";
+import { Auth, Hub } from "aws-amplify";
 import { Button, Input } from '@mui/material';
 
 export default class Verify extends Component {
 
   handleVerification = async event => {
     event.preventDefault();
+    console.log("VERIFY", this.props);
     const { email, code } = this.props.inputs;
     try {
-      await Auth.confirmSignUp(email, code, {
+      const auth = await Auth.confirmSignUp(email, code, {
         forceAliasCreation: true
       });
+      console.log("AUTH", auth);
+
+      // Hub.listen('auth', ({ payload }) => {
+      //   const { event } = payload;
+      //   if (event === 'autoSignIn') {
+      //     const user = payload.data;
+      //     console.log("AUTH_LISTEN", user);
+      //     // this.setState({ sub: user.username })
+      //     console.log("VERIFY_HUB", this.props);
+      //   }
+      // })
 
       this.props.switchComponent("Camera");
     } catch (e) {
