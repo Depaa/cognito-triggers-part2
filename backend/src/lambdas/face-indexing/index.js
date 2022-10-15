@@ -4,8 +4,6 @@ const dynamodb = new DynamoDB.DocumentClient();
 const rekognition = new Rekognition();
 
 exports.handler = async (event) => {
-  console.debug(JSON.stringify(event));
-
   for (const record of event.Records) {
     const key = decodeURIComponent(record.s3.object.key);
     const bucketName = record.s3.bucket.name;
@@ -22,6 +20,7 @@ exports.handler = async (event) => {
       },
       MaxFaces: 1
     }
+    console.debug(params);
 
     try {
       const indexRes = await rekognition.indexFaces(params).promise();
@@ -41,7 +40,7 @@ exports.handler = async (event) => {
         },
         ReturnValues: 'UPDATED_NEW',
       };
-      const result = await dynamodb.update(indexParams).promise();
+      await dynamodb.update(indexParams).promise();
       console.info(`Successfully update user ${sub}`);
     } catch (e) {
       console.error(e)
