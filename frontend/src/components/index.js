@@ -20,7 +20,7 @@ export default class Authentication extends Component {
       sub: '',
       code: '',
       user: null,
-      status: 'SignIn',
+      status: 'SignUp',
       file: null,
       fileUrl: null,
     };

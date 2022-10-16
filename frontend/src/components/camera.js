@@ -59,7 +59,9 @@ export default class Camera extends Component {
       const id = auth.username;
 
       const result = await Storage.put(id + '.jpeg', this.state.file, {
-        level: 'private',
+        //! private means /private/eu-central-1:56f8b59c-347f-4d58-a3fd-30600f40e66d/43226ad8-b801-4044-98d4-d7a2a4ab7bf5.jpeg
+        //! not private means /public/43226ad8-b801-4044-98d4-d7a2a4ab7bf5.jpeg
+        level: 'private', 
         contentType: 'image/jpeg',
       });
       console.log(result);

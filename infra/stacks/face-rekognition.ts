@@ -11,7 +11,7 @@ import * as path from 'path';
 import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications';
 
 export class FaceRekognitionStack extends Stack {
-  private readonly faceCollection: CfnCollection;
+  public readonly faceCollection: CfnCollection;
   private readonly lambdaRole: Role;
   private readonly usersBucket: IBucket;
 

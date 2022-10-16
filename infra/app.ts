@@ -55,6 +55,8 @@ const cognitoStack = new CognitoStack(app, cognitoStackId, {
   usersTableArn: userTableStack.usersTable.tableArn,
   usersBucketArn: userBucketStack.usersBucket.bucketArn,
   stateMachineArn: `arn:aws:states:${env.region}:${env.account}:stateMachine:${signupReminderStackId}`,
+  usersBucket: userBucketStack.usersBucket.bucketName,
+  rekognitionCollectionId: faceRekognitionStack.faceCollection.collectionId,
 }, buildConfig);
 
 const signupReminderStack = new SignupReminderStack(app, signupReminderStackId, {

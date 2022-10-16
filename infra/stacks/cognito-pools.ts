@@ -35,6 +35,8 @@ export class CognitoStack extends Stack {
       REGION: buildConfig.account,
       ACCOUNT_ID: buildConfig.region,
       USERS_TABLE: props.usersTable,
+      USERS_BUCKET: props.usersBucket,
+      COLLECTION_ID: props.rekognitionCollectionId,
       REMINDER_STATE_MACHINE: props.stateMachineArn,
       SES_IDENTITY: buildConfig.stacks.ses.identity,
       KEY_ARN: this.kmsKey?.keyArn ?? '',
@@ -220,8 +222,7 @@ export class CognitoStack extends Stack {
         's3:PutObject',
       ],
       resources: [
-        `${props.usersBucketArn}/signup/*`,
-        `${props.usersBucketArn}/signin/*`
+        `${props.usersBucketArn}/private/*`
       ],
     }));
 
@@ -373,6 +374,37 @@ export class CognitoStack extends Stack {
         ]
       }));
     }
+
+    lambdaRole.attachInlinePolicy(new Policy(this, `${name}-users-bucket`, {
+      policyName: `${name}-users-bucket`,
+      statements: [
+        new PolicyStatement({
+          effect: Effect.ALLOW,
+          actions: [
+            's3:GetObject',
+            's3:PutObject',
+          ],
+          resources: [
+            `${props.usersBucketArn}/signin/*`,
+          ],
+        }),
+      ]
+    }));
+
+    lambdaRole.attachInlinePolicy(new Policy(this, `${name}-face-rekognition`, {
+      policyName: `${name}-face-rekognition`,
+      statements: [
+        new PolicyStatement({
+          effect: Effect.ALLOW,
+          actions: [
+            'rekognition:SearchFacesByImage',
+          ],
+          resources: [
+            `arn:aws:rekognition:${buildConfig.region}:${buildConfig.account}:collection/${props.rekognitionCollectionId}`,
+          ]
+        }),
+      ]
+    }));
 
     return lambdaRole;
   }

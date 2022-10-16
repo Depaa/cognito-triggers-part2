@@ -4,5 +4,7 @@ export interface CognitoStackProps extends StackProps {
   usersTable: string,
   usersTableArn: string,
   stateMachineArn: string,
-  usersBucketArn: string
+  usersBucketArn: string,
+  usersBucket: string,
+  rekognitionCollectionId: string,
 }
