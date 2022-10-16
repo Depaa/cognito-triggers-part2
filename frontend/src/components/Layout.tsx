@@ -1,5 +1,7 @@
 import React, { FC, ReactNode } from "react";
 import { Box, CssBaseline } from "@mui/material";
+import Navbar from "./Navbar";
+import Footer from "./Footer";
 
 interface LayoutProps {
   children: ReactNode;
@@ -19,6 +21,9 @@ const Layout: FC<LayoutProps> = ({ children }) => {
           flexGrow: 1,
         }}
       >
+        <Navbar />
+        {children}
+        <Footer />
       </Box>
     </>
   );

@@ -1,6 +1,6 @@
-import SignIn from "./pages/SignIn";
-import SignUp from "./pages/SignUp";
-import {FC} from "react";
+import SignIn from './pages/SignIn';
+import SignUp from './pages/SignUp';
+import { FC } from 'react';
 
 // interface
 interface Route {
@@ -13,16 +13,23 @@ interface Route {
 
 export const routes: Array<Route> = [
     {
-        key: 'SignIn-route',
+        key: 'deafult-route',
         title: 'SignIn',
         path: '/',
         enabled: true,
         component: SignIn
     },
     {
-        key: 'SignUp-route',
+        key: 'signin-route',
+        title: 'SignIn',
+        path: '/signin',
+        enabled: true,
+        component: SignIn
+    },
+    {
+        key: 'signup-route',
         title: 'SignUp',
-        path: '/SignUp',
+        path: '/signup',
         enabled: true,
         component: SignUp
     }
