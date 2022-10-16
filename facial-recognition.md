@@ -13,7 +13,9 @@ WHAT AM I DOING:
 - amplify init 
 - create identity pool cognito
 - amplify signup/signin
-- 
+- signup with verification email
+- signin very important to have only custom and userSrp ---> to check the last one
+
 
 
 WHAT I EXPECT TO DO:
