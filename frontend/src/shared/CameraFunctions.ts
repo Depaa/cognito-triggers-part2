@@ -1,4 +1,4 @@
-import { MutableRefObject, RefObject } from "react";
+import { RefObject } from "react";
 import Webcam from "react-webcam";
 
 const cameraFunctions = {

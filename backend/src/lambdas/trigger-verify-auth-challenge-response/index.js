@@ -23,14 +23,12 @@ exports.handler = async (event) => {
     console.debug(JSON.stringify(res));
 
     for(const match of res.FaceMatches) {
-      console.log(event.request.privateChallengeParameters.answer)
-      console.log(match.Face.FaceId)
       if(event.request.privateChallengeParameters.answer === match.Face.FaceId) {
         event.response.answerCorrect = true;
       }
     }
-  } catch (e) {
-    console.error(e);
+  } catch (error) {
+    console.error(error);
   }
   return event;
 }

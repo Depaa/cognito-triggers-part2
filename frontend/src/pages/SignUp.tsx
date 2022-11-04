@@ -1,15 +1,15 @@
-import { Box, Input } from "@mui/material";
-import { Storage, Auth } from "aws-amplify";
-import * as React from "react";
-import { useRef, useState } from "react";
+import { Box, Input } from '@mui/material';
+import { Storage, Auth } from 'aws-amplify';
+import { useRef, useState } from 'react';
 import Webcam from 'react-webcam';
-import cameraFunctions from "../shared/CameraFunctions";
+import cameraFunctions from '../shared/CameraFunctions';
 import Button from '../modules/components/Button';
+import crypto from 'crypto';
 
 export default function SignUp() {
-  const [username, setUsername] = useState<string>("");
-  const [verifyCode, setVerifyCode] = useState<string>("");
-  const [state, setState] = useState<string>("SignUp");
+  const [username, setUsername] = useState<string>('');
+  const [verifyCode, setVerifyCode] = useState<string>('');
+  const [state, setState] = useState<string>('SignUp');
   const [cameraUrl, setCameraUrl] = useState<string | null>('');
 
   const [cameraFile, setCameraFile] = useState<File | undefined>(undefined);
@@ -19,7 +19,7 @@ export default function SignUp() {
     try {
       await Auth.signUp({
         username,
-        password: "Password1!",
+        password: `Zz${crypto.randomUUID()}`,
         attributes: {
           email: username,
         },
@@ -27,7 +27,7 @@ export default function SignUp() {
           enabled: true,
         },
       });
-      setState("Verify");
+      setState('Verify');
     } catch (e) {
       console.error(e);
     }
@@ -38,7 +38,7 @@ export default function SignUp() {
       await Auth.confirmSignUp(username, verifyCode, {
         forceAliasCreation: true,
       });
-      setState("Camera");
+      setState('Camera');
     } catch (e) {
       console.error(e);
     }
@@ -47,7 +47,7 @@ export default function SignUp() {
   const capturePhoto = () => {
     const imgSrc = cameraFunctions.capturePhoto(cameraRef);
 
-    const file = cameraFunctions.dataURLtoFile(imgSrc, "test.jpeg");
+    const file = cameraFunctions.dataURLtoFile(imgSrc, 'test.jpeg');
 
     setCameraFile(file);
     setCameraUrl(imgSrc);
@@ -79,12 +79,12 @@ export default function SignUp() {
     facingMode: 'user'
   };
 
-  return state === "SignUp" ? (
+  return state === 'SignUp' ? (
     <Box
       sx={{
         flexGrow: 1,
-        justifyContent: "center",
-        alignItems: "center",
+        justifyContent: 'center',
+        alignItems: 'center',
         marginTop: 40,
         marginBottom: 10,
       }}
@@ -92,41 +92,42 @@ export default function SignUp() {
       <Box
         sx={{
           flexGrow: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
           marginBottom: 2,
+          
         }}>
         <Input
-          type="text"
-          name="username"
+          type='text'
+          name='username'
           value={username}
-          placeholder="Email"
+          placeholder='Email'
           onChange={(event) => setUsername(event.target.value)}
         />
       </Box>
       <Box
         sx={{
           flexGrow: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}>
         <Button
-          type="button"
+          type='button'
           onClick={() => handleSignUp()}
-          variant="contained"
+          variant='contained'
         >
           SignUp
         </Button>
       </Box>
     </Box >
-  ) : state === "Verify" ? (
+  ) : state === 'Verify' ? (
     <Box
       sx={{
         flexGrow: 1,
-        justifyContent: "center",
-        alignItems: "center",
+        justifyContent: 'center',
+        alignItems: 'center',
         marginTop: 40,
         marginBottom: 10,
       }}
@@ -134,51 +135,51 @@ export default function SignUp() {
       <Box
         sx={{
           flexGrow: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
           marginBottom: 2,
         }}>
         <Input
-          type="text"
-          name="code"
+          type='text'
+          name='code'
           value={verifyCode}
-          placeholder="Verification Code"
+          placeholder='Verification Code'
           onChange={(event) => setVerifyCode(event.target.value)}
         />
       </Box>
       <Box
         sx={{
           flexGrow: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
           marginBottom: 2,
         }}>
         <Button
-          type="button"
+          type='button'
           onClick={() => handleVerification()}
-          variant="contained"
+          variant='contained'
         >
           CONFIRM
         </Button>
       </Box>
     </Box >
-  ) : state === "Camera" ? (
+  ) : state === 'Camera' ? (
     <Box
       sx={{
         flexGrow: 1,
-        justifyContent: "center",
-        alignItems: "center",
+        justifyContent: 'center',
+        alignItems: 'center',
         marginTop: 5,
       }}
     >
       <Box
         sx={{
           flexGrow: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
           marginBottom: 2,
         }}>
         <Webcam
@@ -186,21 +187,21 @@ export default function SignUp() {
           audio={false}
           screenshotQuality={1}
           forceScreenshotSourceSize
-          screenshotFormat="image/jpeg" //'image/png'
+          screenshotFormat='image/jpeg' //'image/png'
           videoConstraints={videoConstraints}
-          height="288px" // size of displaying screen
-          width="512px" // size of displaying screen
+          height='288px' // size of displaying screen
+          width='512px' // size of displaying screen
         />
       </Box>
       <Box
         sx={{
           flexGrow: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
           marginBottom: 2,
         }}>
-        <Button type="button" onClick={() => capturePhoto()} variant="contained">
+        <Button type='button' onClick={() => capturePhoto()} variant='contained'>
           Capture
         </Button>
       </Box>
@@ -208,16 +209,16 @@ export default function SignUp() {
         <Box
           sx={{
             flexGrow: 1,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
             marginBottom: 2,
           }}>
-          <div id="image">
+          <div id='image'>
             <img
-              style={{ height: "288px", width: "512px" }}
+              style={{ height: '288px', width: '512px' }}
               src={cameraUrl} //show pic in state
-              alt="Screenshot"
+              alt='Screenshot'
             />
           </div>
         </Box>
@@ -228,25 +229,25 @@ export default function SignUp() {
           <Box
             sx={{
               flexGrow: 1,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
               marginBottom: 2,
             }}>
-            <Button type="button" onClick={() => submitPhoto()} variant="contained">
+            <Button type='button' onClick={() => submitPhoto()} variant='contained'>
               SUBMIT PHOTO
             </Button>
           </Box >
         ) : null
       }
     </Box >
-  ) : state === "Success" ? (
+  ) : state === 'Success' ? (
     <Box
       sx={{
         flexGrow: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        display: "flex",
+        justifyContent: 'center',
+        alignItems: 'center',
+        display: 'flex',
       }}
     >
       <h1> Hey you signed up successfully! </h1>
