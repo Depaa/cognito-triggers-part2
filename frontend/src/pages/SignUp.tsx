@@ -4,7 +4,6 @@ import { useRef, useState } from 'react';
 import Webcam from 'react-webcam';
 import cameraFunctions from '../shared/CameraFunctions';
 import Button from '../modules/components/Button';
-import crypto from 'crypto';
 
 export default function SignUp() {
   const [username, setUsername] = useState<string>('');
@@ -19,13 +18,9 @@ export default function SignUp() {
     try {
       await Auth.signUp({
         username,
-        password: `Zz${crypto.randomUUID()}`,
-        attributes: {
-          email: username,
-        },
-        autoSignIn: {
-          enabled: true,
-        },
+        password: `zZ8${Math.random().toString(36).slice(-8)}!`,
+        attributes: { email: username, },
+        autoSignIn: { enabled: true, },
       });
       setState('Verify');
     } catch (e) {
@@ -61,8 +56,8 @@ export default function SignUp() {
       const id = auth.username;
 
       await Storage.put(id + '.jpeg', cameraFile, {
-        //! private means /private/eu-central-1:56f8b59c-347f-4d58-a3fd-30600f40e66d/43226ad8-b801-4044-98d4-d7a2a4ab7bf5.jpeg
-        //! not private means /public/43226ad8-b801-4044-98d4-d7a2a4ab7bf5.jpeg
+        //! private means /private/eu-central-1:not_sub/file_name
+        //! not private means /public/file_name
         level: 'private',
         contentType: 'image/jpeg',
       });
@@ -96,7 +91,7 @@ export default function SignUp() {
           justifyContent: 'center',
           alignItems: 'center',
           marginBottom: 2,
-          
+
         }}>
         <Input
           type='text'
