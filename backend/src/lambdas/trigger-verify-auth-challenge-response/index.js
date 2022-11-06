@@ -15,7 +15,7 @@ exports.handler = async (event) => {
       }
     },
     MaxFaces: 1,
-    FaceMatchThreshold: 90
+    FaceMatchThreshold: 95
   };
 
   try {

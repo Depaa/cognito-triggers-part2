@@ -19,7 +19,6 @@ export class FaceRekognitionStack extends Stack {
     super(scope, id, props);
 
     this.faceCollection = this.createCollection(name(`${id}-signup`));
-    this.usersBucket = Bucket.fromBucketArn(this, name(`${id}`), props.usersBucketArn)
 
     const baseEnv = {
       ACCOUNT_ID: buildConfig.account,
@@ -27,16 +26,17 @@ export class FaceRekognitionStack extends Stack {
       USERS_TABLE: props.usersTable,
       COLLECTION_ID: this.faceCollection.collectionId
     };
-    this.lambdaRole = this.createLambdaRole(`${id}-role`, props, buildConfig)
+    this.lambdaRole = this.createLambdaRole(`${id}-role`, props, buildConfig);
     const indexFaces = this.createLambdaFunction(name(`${id}-face-indexing`), 'face-indexing', baseEnv);
 
-    this.usersBucket.addEventNotification(EventType.OBJECT_CREATED, new LambdaDestination(indexFaces), { prefix: 'private/' })
+    this.usersBucket = Bucket.fromBucketArn(this, name(`${id}`), props.usersBucketArn);
+    this.usersBucket.addEventNotification(EventType.OBJECT_CREATED, new LambdaDestination(indexFaces), { prefix: 'private/' });
   }
 
   private createCollection(name: string): CfnCollection {
     return new CfnCollection(this, name, {
       collectionId: name,
-    })
+    });
   }
 
 
@@ -128,4 +128,3 @@ export class FaceRekognitionStack extends Stack {
     return lambdaRole;
   }
 }
-
