@@ -30,9 +30,7 @@ export default function SignUp() {
 
   const handleVerification = async () => {
     try {
-      await Auth.confirmSignUp(username, verifyCode, {
-        forceAliasCreation: true,
-      });
+      await Auth.confirmSignUp(username, verifyCode);
       setState('Camera');
     } catch (e) {
       console.error(e);

@@ -41,6 +41,8 @@ export default function SignIn() {
     } else {
       setState("CustomChallenge");
       setchallengeRequest(cognitoUser);
+      setCameraUrl(null);
+      setCameraFile(undefined);
     }
   }
 
