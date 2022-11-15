@@ -12,17 +12,6 @@
 ### CUSTOM_MESSAGE [✅]
 ### CUSTOM_EMAIL_SENDER [✅]
 ### CUSTOM_SMS_SENDER [✅]
-### DEFINE_AUTH_CHALLENGE [❌]
-### CREATE_AUTH_CHALLENGE [❌]
-### VERIFY_AUTH_CHALLENGE_RESPONSE [❌]
-
-
-# Users table Stack
-## Dynamodb users table
-
-# Signup reminders Stack
-## Stepfunction steps:
-1. Wait 
-2. Remind user
-3. Wait
-4. Notify & Delete user
+### DEFINE_AUTH_CHALLENGE [✅]
+### CREATE_AUTH_CHALLENGE [✅]
+### VERIFY_AUTH_CHALLENGE_RESPONSE [✅]
