@@ -1,8 +1,8 @@
 import { App, Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import { BuildConfig } from '../lib/common/config.interface';
 import { name } from '../lib/common/utils';
-import { AccountRecovery, StringAttribute, UserPool, UserPoolClient, UserPoolEmail, UserPoolOperation } from 'aws-cdk-lib/aws-cognito';
-import { Effect, Policy, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { AccountRecovery, CfnIdentityPool, CfnIdentityPoolRoleAttachment, StringAttribute, UserPool, UserPoolClient, UserPoolEmail, UserPoolOperation } from 'aws-cdk-lib/aws-cognito';
+import { Effect, FederatedPrincipal, Policy, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { Architecture, Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { CognitoStackProps } from '../lib/interfaces/cognito-props';
 import { Key } from 'aws-cdk-lib/aws-kms';
@@ -28,10 +28,15 @@ export class CognitoStack extends Stack {
     this.createUserPoolDomain(this.userPool, name(`${id}-domain`));
     this.createUserPoolDomain(this.oldUserPool, name(`${id}-old-domain`));
 
+    const userPoolClientForCustom = this.createAppClient(this.userPool, name(`${id}-custom-client`), true);
+    this.createIdentityPool(userPoolClientForCustom, name(`${id}-identity-pool`), props);
+
     const baseEnv = {
       REGION: buildConfig.account,
       ACCOUNT_ID: buildConfig.region,
       USERS_TABLE: props.usersTable,
+      USERS_BUCKET: props.usersBucket,
+      COLLECTION_ID: props.rekognitionCollectionId,
       REMINDER_STATE_MACHINE: props.stateMachineArn,
       SES_IDENTITY: buildConfig.stacks.ses.identity,
       KEY_ARN: this.kmsKey?.keyArn ?? '',
@@ -89,7 +94,7 @@ export class CognitoStack extends Stack {
     if (buildConfig.stacks.cognito.enableCustomSender) {
       // send Email through SES
       const lambdaFunctionCustomSender = this.createLambdaFunction(name(`${id}-custom-sender`), 'trigger-custom-sender', baseEnv);
-      this.userPool.addTrigger(UserPoolOperation.CUSTOM_EMAIL_SENDER, lambdaFunctionCustomSender);  
+      this.userPool.addTrigger(UserPoolOperation.CUSTOM_EMAIL_SENDER, lambdaFunctionCustomSender);
       this.userPool.addTrigger(UserPoolOperation.CUSTOM_SMS_SENDER, lambdaFunctionCustomSender);
     }
   }
@@ -130,20 +135,19 @@ export class CognitoStack extends Stack {
         sesRegion: buildConfig.region,
         fromEmail: buildConfig.stacks.ses.identity,
         fromName: 'Cognito blog',
-        // replyTo: 'support@myawesomeapp.com',
-        // sesVerifiedDomain: 'myawesomeapp.com',
       }),
     });
   }
 
-  private createAppClient(userPool: UserPool, name: string): UserPoolClient {
+  private createAppClient(userPool: UserPool, name: string, custom = false): UserPoolClient {
     return userPool.addClient(name, {
       generateSecret: false,
       userPoolClientName: name,
       authFlows: {
-        adminUserPassword: true,
+        adminUserPassword: !custom,
         custom: true,
-        userPassword: true,
+        userPassword: !custom,
+        userSrp: true
       },
       refreshTokenValidity: Duration.minutes(60),
       accessTokenValidity: Duration.minutes(5),
@@ -155,6 +159,78 @@ export class CognitoStack extends Stack {
     userPool.addDomain(name, {
       cognitoDomain: {
         domainPrefix: name.replace('cognito-', ''),
+      }
+    });
+  }
+
+  private createIdentityPool(userPoolClient: UserPoolClient, name: string, props: CognitoStackProps): void {
+    const identityPool = new CfnIdentityPool(this, name, {
+      allowUnauthenticatedIdentities: false,
+      cognitoIdentityProviders: [
+        {
+          clientId: userPoolClient.userPoolClientId,
+          providerName: this.userPool.userPoolProviderName,
+        },
+      ],
+    });
+
+    const authenticatedRole = new Role(this, `${name}-authenticated-role`, {
+      assumedBy: new FederatedPrincipal(
+        'cognito-identity.amazonaws.com',
+        {
+          'StringEquals': { 'cognito-identity.amazonaws.com:aud': identityPool.ref },
+          'ForAnyValue:StringLike': { 'cognito-identity.amazonaws.com:amr': 'authenticated' },
+        },
+        'sts:AssumeRoleWithWebIdentity'),
+    });
+    authenticatedRole.addToPolicy(new PolicyStatement({
+      effect: Effect.ALLOW,
+      actions: [
+        'mobileanalytics:PutEvents',
+        'cognito-sync:*',
+        'cognito-identity:*'
+      ],
+      resources: ['*'],
+    }));
+    authenticatedRole.addToPolicy(new PolicyStatement({
+      effect: Effect.ALLOW,
+      actions: [
+        's3:PutObject',
+      ],
+      resources: [`${props.usersBucketArn}/private/\${cognito-identity.amazonaws.com:sub}/*`],
+    }));
+
+    const unauthenticatedRole = new Role(this, `${name}-unauthenticated-role`, {
+      assumedBy: new FederatedPrincipal(
+        'cognito-identity.amazonaws.com',
+        {
+          'StringEquals': { 'cognito-identity.amazonaws.com:aud': identityPool.ref },
+          'ForAnyValue:StringLike': { 'cognito-identity.amazonaws.com:amr': 'unauthenticated' },
+        },
+        'sts:AssumeRoleWithWebIdentity'),
+    });
+    unauthenticatedRole.addToPolicy(new PolicyStatement({
+      effect: Effect.ALLOW,
+      actions: [
+        'mobileanalytics:PutEvents',
+      ],
+      resources: ['*'],
+    }));
+    authenticatedRole.addToPolicy(new PolicyStatement({
+      effect: Effect.ALLOW,
+      actions: [
+        's3:PutObject',
+      ],
+      resources: [
+        `${props.usersBucketArn}/private/*`
+      ],
+    }));
+
+    new CfnIdentityPoolRoleAttachment(this, `${name}-default-policy`, {
+      identityPoolId: identityPool.ref,
+      roles: {
+        'unauthenticated': unauthenticatedRole.roleArn,
+        'authenticated': authenticatedRole.roleArn
       }
     });
   }
@@ -298,6 +374,37 @@ export class CognitoStack extends Stack {
         ]
       }));
     }
+
+    lambdaRole.attachInlinePolicy(new Policy(this, `${name}-users-bucket`, {
+      policyName: `${name}-users-bucket`,
+      statements: [
+        new PolicyStatement({
+          effect: Effect.ALLOW,
+          actions: [
+            's3:GetObject',
+            's3:PutObject',
+          ],
+          resources: [
+            `${props.usersBucketArn}/signin/*`,
+          ],
+        }),
+      ]
+    }));
+
+    lambdaRole.attachInlinePolicy(new Policy(this, `${name}-face-rekognition`, {
+      policyName: `${name}-face-rekognition`,
+      statements: [
+        new PolicyStatement({
+          effect: Effect.ALLOW,
+          actions: [
+            'rekognition:SearchFacesByImage',
+          ],
+          resources: [
+            `arn:aws:rekognition:${buildConfig.region}:${buildConfig.account}:collection/${props.rekognitionCollectionId}`,
+          ]
+        }),
+      ]
+    }));
 
     return lambdaRole;
   }

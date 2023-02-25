@@ -18,20 +18,18 @@
   },
   "context": {
     "dev": {
-      "account": "1234567890",
+      "account": "123456789012",
       "region": "eu-central-1",
       "environment": "dev",
-      "version": "0.0.1",
+      "version": "0.1.0",
       "build": "1",
       "project": "cognito-triggers-blog",
       "stacks": {
         "ses": {
-          "identity": "youremail@address.com",
+          "identity": "email",
           "receivers": [
-            "youremail+1@address.com",
-            "youremail+2@address.com",
-            "youremail+3@address.com",
-            "youremail+4@address.com"
+            "email",
+            "email"
           ]
         },
         "cognito": {

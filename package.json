@@ -1,19 +1,18 @@
 {
   "name": "cdk-cognito-triggers",
-  "version": "0.30.0",
+  "version": "0.74.0",
   "bin": {
     "cdk-boilerplate": "infra/app.js"
   },
   "scripts": {
-    "build": "tsc ",
+    "build": "tsc",
     "watch": "tsc -w",
-    "test": "node test/send-locations.js",
     "cdk": "cdk",
-    "bootstrap": "cdk bootstrap -c config=dev --profile personal",
-    "synth": "cdk synth -c config=dev --profile personal",
-    "diff": "npm version patch --no-git-tag-version && npm run build && cdk diff \"*\" -c config=dev --profile personal",
-    "deploy": "npm version minor --no-git-tag-version && npm run build && cdk deploy \"*\" -c config=dev --require-approval=never --progress=events --profile personal",
-    "destroy": "cdk destroy --all -c config=dev --profile personal"
+    "bootstrap": "cdk bootstrap -c config=dev",
+    "synth": "cdk synth -c config=dev",
+    "diff": "npm version patch --no-git-tag-version && npm run build && cdk diff \"*\" -c config=dev",
+    "deploy": "npm version minor --no-git-tag-version && npm run build && cdk deploy \"*\" -c config=dev --require-approval=never --progress=events",
+    "destroy": "cdk destroy --all -c config=dev"
   },
   "devDependencies": {
     "@types/node": "^10.17.60",

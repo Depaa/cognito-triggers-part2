@@ -7,7 +7,7 @@ const sfn = new StepFunctions();
 exports.handler = async (event) => {
   console.debug(event);
 
-  const address = event.request.userAttributes.email.split("@");
+  const address = event.request.userAttributes.email.split('@');
   if (address[1] !== 'gmail.com' && address[1] !== 'icloud.com' && address[1] !== 'outlook.com') {
     throw new Error('You must use gmail, icloud or outlook');
   }
@@ -25,3 +25,13 @@ exports.handler = async (event) => {
 
   return event;
 }
+
+/*
+exports.handler = async (event) => {
+  console.debug(event);
+  // for face recognition authentication we need to autoconfirm users
+  event.response.autoConfirmUser = true;
+  event.response.autoVerifyEmail = true;
+  return event;
+}
+*/

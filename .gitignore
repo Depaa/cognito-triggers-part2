@@ -9,6 +9,10 @@ build/
 cdk.out
 
 # Lambda js files
-!backend/src/lambdas/*/*.js
+!backend/src/**/*.js
 !infra/lambdas/*/*.js
 !test/**.js
+!frontend/**/*.js
+
+#amplify
+aws-exports.ts

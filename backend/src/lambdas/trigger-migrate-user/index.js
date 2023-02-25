@@ -6,14 +6,12 @@ const cognitoIDP = new CognitoIdentityServiceProvider();
 
 const verifier = CognitoJwtVerifier.create({
     userPoolId: process.env.OLD_USER_POOL_ID,
-    tokenUse: "id",
+    tokenUse: 'id',
     clientId: process.env.OLD_USER_POOL_CLIENT_ID,
 });
 
 exports.handler = async (event) => {
     console.debug(event);
-
-    process.env.USER_POOL_ID = event.userPoolId;
 
     if (event.triggerSource === 'UserMigration_Authentication') {
         // authenticate user with your existing user directory service
@@ -22,8 +20,8 @@ exports.handler = async (event) => {
             email: user.email,
             email_verified: 'true',
         };
-        event.response.finalUserStatus = "CONFIRMED";
-        event.response.messageAction = "SUPPRESS";
+        event.response.finalUserStatus = 'CONFIRMED';
+        event.response.messageAction = 'SUPPRESS';
     }
     return event;
 }
