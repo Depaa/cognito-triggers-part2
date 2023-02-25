@@ -3,7 +3,7 @@
 * Change cdk.context.json account and region
 * Change cdk.json context variables
 * npm install
-* npm run deploy
+* npm run deploy (be sure to check your email and validate your SES identity)
 
 # How to run react application
 
